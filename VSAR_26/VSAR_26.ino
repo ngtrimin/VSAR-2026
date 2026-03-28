@@ -121,7 +121,10 @@ void dc_control(uint8_t channelA, uint8_t channelB, int16_t speed, bool reverse 
 // DRIVETRAIN: Mecanum Drive
 // #########################
 
-void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota) {
+bool intake_on=false;
+bool last_toggle=false;
+
+void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota, bool intake_toggle) {
   int16_t x = map(stra, 0, 255, -SPD_DRIVE,  SPD_DRIVE);
   int16_t y = map(forw, 0, 255,  SPD_DRIVE, -SPD_DRIVE);
   int16_t r = map(rota, 0, 255,  SPD_DRIVE, -SPD_DRIVE);
@@ -145,14 +148,17 @@ void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota) {
   Serial.print((double)(-x + y - r) / d); Serial.print(" "); Serial.print((double)( x + y + r) / d); Serial.print("\n"); // LB RB
   delay(500);
   #endif
-}
 
-// #################
-// SUBSYSTEMS: INTAKE
-// #################
+  // #################
+  // SUBSYSTEMS: INTAKE
+  // #################
+  if(intake_toggle&&!last_toggle){
+    intake_on=!intake_on;
+  }
+  last_toggle=intake_toggle;
+  if(intake_on)dc_control(IN_A,IN_B,SPD_DRIVE);
+  else dc_control(IN_A,IN_B,0);
 
-void intake_control(int16_t speed){
-  dc_control(IN_A,IN_B,speed);
 }
 
 
@@ -163,21 +169,19 @@ void intake_control(int16_t speed){
 void setup() {
   Serial.begin(115200);  // Arduino Uno R3 baud rate (bps)
 
-  // PWMDriver_init();
+  PWMDriver_init();
   PS2_init();
 }
 
 void loop() {
   ps2.read_gamepad();  // update from controller
 
-  drivetrain_update(ps2.Analog(PSS_LX), ps2.Analog(PSS_LY), ps2.Analog(PSS_RX));
-  
-  //tune intake
-  bool intake_toggle=false;
-  int16_t intake_speed=4095;
-  //intake
-  if(ps2.Button(PSB_R2))intake_toggle=!intake_toggle;
+  drivetrain_update(
+    ps2.Analog(PSS_LX), 
+    ps2.Analog(PSS_LY), 
+    ps2.Analog(PSS_RX), 
+    ps2.ButtonPressed(PSB_R2)
+  );
 
-  if(intake_toggle)intake_control(intake_speed);
-  else intake_control(0);
+  //ps2.Analog(PSS)
 }
