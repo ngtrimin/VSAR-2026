@@ -121,9 +121,6 @@ void dc_control(uint8_t channelA, uint8_t channelB, int16_t speed, bool reverse 
 // DRIVETRAIN: Mecanum Drive
 // #########################
 
-bool intake_on=false;
-bool last_toggle=false;
-
 void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota, bool intake_toggle) {
   int16_t x = map(stra, 0, 255, -SPD_DRIVE,  SPD_DRIVE);
   int16_t y = map(forw, 0, 255,  SPD_DRIVE, -SPD_DRIVE);
@@ -149,18 +146,26 @@ void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota, bool intake_tog
   delay(500);
   #endif
 
-  // #################
-  // SUBSYSTEMS: INTAKE
-  // #################
+
+
+}
+
+// #################
+// INTAKE
+// #################
+
+
+bool intake_on=false;
+bool last_toggle=false;
+
+void intake_update(bool intake_toggle){
   if(intake_toggle&&!last_toggle){
     intake_on=!intake_on;
   }
   last_toggle=intake_toggle;
   if(intake_on)dc_control(IN_A,IN_B,SPD_DRIVE);
   else dc_control(IN_A,IN_B,0);
-
 }
-
 
 // #################
 // ARDUINO FUNCTIONS
@@ -179,9 +184,10 @@ void loop() {
   drivetrain_update(
     ps2.Analog(PSS_LX), 
     ps2.Analog(PSS_LY), 
-    ps2.Analog(PSS_RX), 
-    ps2.ButtonPressed(PSB_R2)
+    ps2.Analog(PSS_RX),
   );
+
+  intake_update(ps2.ButtonPressed(PSB_R2));
 
   //ps2.Analog(PSS)
 }
