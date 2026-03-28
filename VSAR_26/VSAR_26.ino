@@ -150,9 +150,9 @@ void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota, bool intake_tog
 
 }
 
-// #################
+// ######
 // INTAKE
-// #################
+// ######
 
 
 bool intake_on=false;
