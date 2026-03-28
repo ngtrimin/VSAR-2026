@@ -3,7 +3,7 @@
 ( o.o )( o.o )( o.o )( o.o )       |___CONFIGURATION: Constants and channels
  > ^ <  > ^ <  > ^ <  > ^ <        |___PWM DRIVER: Adafruit PWM Servo Driver
 #######              #######       |___HARDWARE API: dc_control()
- /\_/\    ghelopax    /\_/\        |___DRIVETRAIN: Mecanum Drive
+ /\_/\      ntm       /\_/\        |___DRIVETRAIN: Mecanum Drive
 ( o.o )              ( o.o )       |___ARDUINO FUNCTIONS: setup(), loop()
  > ^ <   @itsmevjnk   > ^ <
 #######              #######
@@ -55,31 +55,6 @@
 #define PS2_CMD             11
 #define PS2_ATT             10
 #define PS2_CLK             12
-
-/* Stick Value */
-#define PSS_RX 5
-#define PSS_RY 6
-#define PSS_LX 7
-#define PSS_LY 8
-
-/* Analog Button */
-#define PSAB_PAD_RIGHT   9
-#define PSAB_PAD_UP      11
-#define PSAB_PAD_DOWN    12
-#define PSAB_PAD_LEFT    10
-#define PSAB_L2          19
-#define PSAB_R2          20
-#define PSAB_L1          17
-#define PSAB_R1          18
-#define PSAB_GREEN       13
-#define PSAB_RED         14
-#define PSAB_BLUE        15
-#define PSAB_PINK        16
-#define PSAB_TRIANGLE    13
-#define PSAB_CIRCLE      14
-#define PSAB_CROSS       15
-#define PSAB_SQUARE      16
-
 
 // ##########
 // PWM DRIVER
@@ -199,7 +174,7 @@ void loop() {
   
   //tune intake
   bool intake_toggle=false;
-  long long intake_speed=1e18;
+  int16_t intake_speed=4095;
   //intake
   if(ps2.Button(PSB_R2))intake_toggle=!intake_toggle;
 
