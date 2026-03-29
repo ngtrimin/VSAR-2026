@@ -27,6 +27,9 @@
 // Drive motor speed
 #define SPD_DRIVE           4095
 
+// Slider speed
+#define SLIDER_SPD          3000
+
 // Servo PW
 #define PW_MIN              440
 #define PW_MAX              2270
@@ -46,9 +49,14 @@
 
 #define RB_A 5
 #define RB_B 6
+
 // Intake Motor
 #define IN_A 9
 #define IN_B 10
+
+// Slider Motor
+#define SL_A 14
+#define SL_B 15
 
 /* PS2 pins */
 #define PS2_DAT             13
@@ -121,7 +129,7 @@ void dc_control(uint8_t channelA, uint8_t channelB, int16_t speed, bool reverse 
 // DRIVETRAIN: Mecanum Drive
 // #########################
 
-void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota, bool intake_toggle) {
+void drivetrain_update(uint8_t stra, uint8_t forw, uint8_t rota) {
   int16_t x = map(stra, 0, 255, -SPD_DRIVE,  SPD_DRIVE);
   int16_t y = map(forw, 0, 255,  SPD_DRIVE, -SPD_DRIVE);
   int16_t r = map(rota, 0, 255,  SPD_DRIVE, -SPD_DRIVE);
@@ -167,6 +175,16 @@ void intake_update(bool intake_toggle){
   else dc_control(IN_A,IN_B,0);
 }
 
+// ######
+// SLIDER
+// ######
+
+void slider_update(bool up,bool down){
+  if(up&&!down)dc_control(SL_A,SL_B,SLIDER_SPD);
+  else if(down&&!up)dc_control(SL_A,SL_B,-SLIDER_SPD);
+  else dc_control(SL_A,SL_B,0);
+}
+
 // #################
 // ARDUINO FUNCTIONS
 // #################
@@ -184,10 +202,17 @@ void loop() {
   drivetrain_update(
     ps2.Analog(PSS_LX), 
     ps2.Analog(PSS_LY), 
-    ps2.Analog(PSS_RX),
+    ps2.Analog(PSS_RX)
   );
 
+  //intake
   intake_update(ps2.ButtonPressed(PSB_R2));
+
+  //slider
+  slider_update(
+    ps2.Button(PSB_TRIANGLE),
+    ps2.Button(PSB_CROSS)
+  );
 
   //ps2.Analog(PSS)
 }
